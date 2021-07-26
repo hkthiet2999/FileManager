@@ -15,8 +15,9 @@ const { Console } = require('console')
 
 const app = express()
 app.set('view engine', 'ejs')
+app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: false}))
-app.use(cookieParser('nvm'));
+app.use(cookieParser('hkt'));
 app.use(session({ cookie: { maxAge: 600000 }}));
 app.use(flash());
 
@@ -93,5 +94,30 @@ app.post('/upload', uploader.single('attachment'), (req, res) => {
     return res.json({code: 0, message: 'Upload thành công, đã lưu tại ' + newPath})
 })
 
-const port = process.env.PORT || 9090
+app.post('/delete', (req, res) => {
+    console.log(req.body)
+    console.log(req.vars)
+
+    const {email, name} = req.body
+
+    const {root} = req.vars //
+    const currentDir = `${root}/users/${email}/${name}`
+    console.log(currentDir)
+
+    
+    fs.unlink(currentDir, (err) => {
+        if (err) {
+          console.error(err)
+          return
+        }
+      
+        //file removed
+        return res.json({code: 0, message: 'Xóa thành công tập tin tại path:' + currentDir})
+    })
+    
+
+    // console.log(req.body)
+})
+
+const port = process.env.PORT || 8080
 app.listen(port, () => console.log(`http://localhost:${port}`))

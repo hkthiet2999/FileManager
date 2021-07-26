@@ -91,7 +91,7 @@
             </thead>
             <tbody>
                 <% files.forEach(f => { %>
-                    <tr>
+                    <tr id="<%= f.name %>">
                         <td>
                             <%- f.icon -%>
                             <a href="<%= f.subPath %>"><%= f.name %></a>
@@ -102,7 +102,8 @@
                         <td>
                             <span><i class="fa fa-download action"></i></button>
                                 <span><i class="fa fa-edit action"></i></button>
-                                    <span><i class="fa fa-trash action"></i></button>
+                                    <span><a data-name="<%= f.name %>" href="/remove/<%= f.name%>" class="delete-btn">Xóa</a></button>
+
                         </td>
                     </tr>
                 <% }) %>
@@ -130,7 +131,31 @@
         
 
     </div>
-
+    <!-- The Modal -->
+    <div class="modal fade" id="confirmDialog">
+        <div class="modal-dialog">
+        <div class="modal-content">
+        
+            <!-- Modal Header -->
+            <div class="modal-header">
+            <h4 class="modal-title">Xóa sản phẩm</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            
+            <!-- Modal body -->
+            <div class="modal-body">
+            Bạn có chắc muốn xóa sản phẩm <strong class="product-name">Ok?</strong>
+            </div>
+            
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger btn-confirm-delete">Xóa</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+            </div>
+            
+        </div>
+        </div>
+    </div>
 
     <!-- Delete dialog -->
     <div class="modal fade" id="confirm-delete">
@@ -143,7 +168,7 @@
                 </div>
 
                 <div class="modal-body">
-                    Bạn có chắc rằng muốn xóa tập tin <strong>image.jpg</strong>
+                    Bạn có chắc rằng muốn xóa tập tin <strong></strong>
                 </div>
 
                 <div class="modal-footer">
@@ -262,7 +287,7 @@
 
 
                 let xhr = new XMLHttpRequest();
-                xhr.open('POST', 'http://localhost:9090/upload', true)
+                xhr.open('POST', 'http://localhost:8080/upload', true)
                 xhr.addEventListener('load', e => {
                     if (xhr.readyState === 4 && xhr.status === 200) {
                         const json =JSON.parse(xhr.responseText)
@@ -285,8 +310,52 @@
                 xhr.send(form);
 
             })
-            
+            //////////////////////////////////////
 
+            $('tbody .delete-btn').click(e =>{
+                e.preventDefault()
+                let name = $(e.target).data('name')
+            
+                $('#confirmDialog .product-name').html(name)
+                $('#confirmDialog .btn-confirm-delete').attr('data-name', name)
+
+                $('#confirmDialog').modal('show')
+            })
+            $('#confirmDialog .btn-confirm-delete').click(e =>{
+                let name =  e.target.dataset.name
+                
+                $('#confirmDialog').modal('hide')
+                deleteProduct(name)
+            })
+            function deleteProduct(name){
+                let email = '<%= user.email %>'
+                console.log('Delete byname')
+                console.log('User email:', email )
+                fetch('http://localhost:8080/delete', {
+                    method: 'POST',
+                    headers:{
+                        // 'Content-Type':'application/x-www-form-urlencoded'
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    // body: `name=${encodeURIComponent(name)}`
+                    body: JSON.stringify({
+                        name: name,
+                        email: email
+                    })
+                })
+                .then(res => res.json())
+                .then(json => {
+                    if(json.code === 0){
+                        console.log('Xoa thanh cong')
+                        $(`tr#${name}`).remove()
+                    }
+                    else{
+                        console.log(json.message)
+                    }
+                    })
+                .catch(e => console.log(e))
+            }
         })
 
     </script>
