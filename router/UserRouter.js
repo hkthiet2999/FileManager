@@ -54,7 +54,7 @@ Router.post('/login', loginValidator, (req, res) =>{
                 const hased = results[0].password
                 const match = bcrypt.compareSync(password, hased)
                 
-                if(!match) {
+                if(match) {
                     req.flash('error', 'Sai email hoặc password')
                     req.flash('password', password)
                     req.flash('email', email)
@@ -129,7 +129,7 @@ const registerValidator = [
 ]
 Router.post('/register', registerValidator, (req, res) =>{
     let results = validationResult(req)
-
+    console.log('req.vars: ', req.vars)
     if (results.errors.length === 0){
         const {name, email, password} = req.body
         const hased = bcrypt.hashSync(password, 10)
@@ -147,9 +147,14 @@ Router.post('/register', registerValidator, (req, res) =>{
             else if (results.affectedRows === 1) {
                 const {root} = req.vars
                 const userDir = `${root}/users/${email}`
+                const userDir_sub = `${root}/users/${email}/files`
+
 
                 fs.mkdir(userDir, () => {
-                    return res.redirect('/user/login')
+                    fs.mkdir(userDir_sub, () => {
+                        return res.redirect('/user/login')
+                    })  
+                    // return res.redirect('/user/login')
                 })                
             }
             else {

@@ -69,8 +69,8 @@ app.get('/', getCurrentDir, (req, res) =>{
 
 })
 
-app.post('./upload', uploader.single('attachment'), (req, res) => {
-    
+app.post('/upload', uploader.single('attachment'), (req, res) => {
+    console.log(req.body)
     const {email, path} = req.body
     const file = req.file
 

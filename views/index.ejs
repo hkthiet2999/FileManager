@@ -122,26 +122,12 @@
                         <div id="progress-indicator" class="progress-bar bg-success" style="width:0%;height:10px"></div>
                     </div>
                 </div>
-                <p class="small">Người dùng chỉ được upload tập tin có kích thước tối đa là 20 MB. Các tập tin thực thi (*.exe, *.msi, *.sh) không được phép upload.</p>
-                <p class="small">Khi nhấn nút upload thì</p>
-                <ul class="small">
-                    <li>Progress bar sẽ hiển thị tiến độ của quá trình upload. Ban đầu progress bar bị ẩn đi.</li>
-                    <li>Khi đang diễn ra quá trình upload thì button <strong>Upload</strong> sẽ bị disabled.</li>
-                    <li>Sau khi upload thành công thì progress bar được ẩn đi, file sẽ được hiển thị trong danh sách bên trên và button được enabled trở lại.</li>
-                </ul>
+                <p class="small">Bạn chỉ được upload tập tin có kích thước tối đa là 20 MB. Các tập tin thực thi (*.exe, *.msi, *.sh) không được phép upload.</p>
+
                 <button id="uploadButton" type="button" class="btn btn-success px-5">Upload</button>
         </div>
 
-        <div class="modal-example my-5">
-            <h4>Một số dialog mẫu</h4>
-            <p>Sử dụng các dialog này cho các chức năng trong bài tập.</p>
-            <ul>
-                <li><a href="#" data-toggle="modal" data-target="#confirm-delete">Confirm delete</a></li>
-                <li><a href="#" data-toggle="modal" data-target="#confirm-rename">Confirm rename</a></li>
-                <li><a href="#" data-toggle="modal" data-target="#new-file-dialog">New file dialog</a></li>
-                <li><a href="#" data-toggle="modal" data-target="#message-dialog">Message Dialog</a></li>
-            </ul>
-        </div>
+        
 
     </div>
 
@@ -253,6 +239,13 @@
         $(document).ready(() =>{
 
             $('#uploadButton').click(() => {
+                // let indicator = document.getElementById('progress-indicator')
+                // indicator.style.width = 0
+
+                let email = '<%= user.email %>'
+                
+                console.log('user email: ', email)
+
                 let uploaFile = document.getElementById('attachment');
                 if (uploaFile.files.length === 0) {
                     return alert('Vui lòng chọn tập tin')
@@ -261,9 +254,12 @@
                 let file = uploaFile.files[0];
 
                 let form = new FormData();
-                form.set('email', 'hoangkienthiet@gmail.com');
-                form.set('path', '/images/');
+                form.set('email', email);
+                form.set('path', '/files/');
                 form.set('attachment', file);
+                console.log('Form:', form)
+                console.log('File:', file) 
+
 
                 let xhr = new XMLHttpRequest();
                 xhr.open('POST', 'http://localhost:9090/upload', true)
@@ -277,16 +273,19 @@
                 let indicator = document.getElementById('progress-indicator')
 
                 xhr.upload.addEventListener('progress', e => {
+                    
                     let loaded = e.loaded
                     let total = e.total
                     let progress = Math.round(loaded * 100 / total)
 
                     console.log('Uploading ' + progress + '%')
                     indicator.style.width = progress + '%'
+
                 })
+                xhr.send(form);
+
             })
             
-            xhr.send(form);
 
         })
 
