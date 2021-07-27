@@ -72,15 +72,16 @@ app.get('/', getCurrentDir, (req, res) =>{
 
 app.post('/upload', uploader.single('attachment'), (req, res) => {
     console.log(req.body)
-    const {email, path} = req.body
+    const {email} = req.body
     const file = req.file
 
-    if (!email || !path || !file) {
+    if (!email || !file) {
         return res.json({code: 1, message: ' Thông tin không hợp lệ'})
     }
 
     const {root} = req.vars
-    const currentDir = `${root}/users/${email}/${path}`
+    // const currentDir = `${root}/users/${email}/${path}`
+    const currentDir = `${root}/users/${email}`
 
     if (!fs.existsSync(currentDir)) {
         return res.json({code: 2, message: 'Đường dẫn cần lưu không đúng'})

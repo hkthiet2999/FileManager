@@ -280,7 +280,7 @@
 
                 let form = new FormData();
                 form.set('email', email);
-                form.set('path', '/files/');
+                // form.set('path', '/files/');
                 form.set('attachment', file);
                 console.log('Form:', form)
                 console.log('File:', file) 
@@ -308,6 +308,9 @@
 
                 })
                 xhr.send(form);
+                alert('Thêm tập tin thành công')
+                location.reload();
+
 
             })
             //////////////////////////////////////
@@ -348,7 +351,9 @@
                 .then(json => {
                     if(json.code === 0){
                         console.log('Xoa thanh cong')
-                        $(`tr#${name}`).remove()
+                        alert('Đã xóa tập tin thành công')
+                        location.reload();
+                        // $(`#${name}`).remove()
                     }
                     else{
                         console.log(json.message)
